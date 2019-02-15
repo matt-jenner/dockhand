@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Dockhand
+namespace Dockhand.Utils
 {
     public class DockerPercentStringConverter : JsonConverter
     {

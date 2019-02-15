@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Dockhand.Models;
+using Dockhand.Dtos;
 
-namespace Dockhand
+namespace Dockhand.Client
 {
     internal static class DockerCommands
     {
@@ -22,6 +20,8 @@ namespace Dockhand
                 return $"docker images --format {formatTemplate}";
             }
 
+            internal static string ListIds = "docker image ls -q";
+
             internal static string RunContainer(string imageId, IEnumerable<DockerPortMapping> portMappings)
             {
                 var command = "docker run -d ";
@@ -33,7 +33,7 @@ namespace Dockhand
                 return command + $" {imageId}";
             }
 
-            internal static string Remove(string imageId) => $"docker rmi ${imageId}";
+            internal static string Remove(string imageId) => $"docker rmi {imageId}";
         }
 
         internal static class Container
@@ -48,6 +48,7 @@ namespace Dockhand
             internal static string Kill(string containerId) => $"docker container kill {containerId}";
             internal static string Remove(string containerId) => $"docker container rm {containerId}";
             internal static string Prune = "docker container prune -f";
+            internal static string ListIds = "docker ps -q";
         }
     }
 }

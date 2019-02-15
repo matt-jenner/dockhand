@@ -1,7 +1,8 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Dockhand;
+using Dockhand.Client;
+using Dockhand.Dtos;
+using Dockhand.Models;
 using NUnit.Framework;
 
 namespace Tests
@@ -11,14 +12,13 @@ namespace Tests
         [SetUp]
         public async Task Setup()
         {
-            var dcm = new DockerContainerManager(@"c:\Repos\C#\Just.Anarchy");
-            await dcm.BuildImageAsync(@"Just.ContainedAnarchy\Dockerfile", "final","justcontainedanarchy", "test");
-            var imageResult = (await dcm.GetImagesAsync()).First(x => x.Repository == "justcontainedanarchy" && x.Tag == "test");
-            var containerId = await dcm.StartContainerAsync(imageResult.Id);
-            var stats = dcm.GetContainerStats(containerId, TimeSpan.FromSeconds(60));
-            await dcm.KillContainerAsync(containerId);
-            await dcm.RemoveContainer(containerId);
-            await dcm.RemoveImage(imageResult.Id);
+            var client = DockerClient.ForDirectory(@"c:\Repos\C#\Just.Anarchy");
+            var image = await client.BuildImageAsync(@"Just.ContainedAnarchy\Dockerfile", "final","justcontainedanarchy", "test");
+            var container = await image.StartContainerAsync(new []{ new DockerPortMapping(80,5000) });
+            var stats = await container.MonitorStatsFor(TimeSpan.FromSeconds(60));
+            await container.KillAsync();
+            await container.RemoveAsync();
+            await image.RemoveAsync();
         }
 
         [Test]

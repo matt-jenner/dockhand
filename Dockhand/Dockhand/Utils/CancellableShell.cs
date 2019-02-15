@@ -2,7 +2,7 @@
 using CShellNet;
 using Medallion.Shell;
 
-namespace Dockhand
+namespace Dockhand.Utils
 {
     class CancellableShell : CShell
     {

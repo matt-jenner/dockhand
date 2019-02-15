@@ -1,7 +1,8 @@
 ﻿using System;
+using Dockhand.Utils;
 using Newtonsoft.Json;
 
-namespace Dockhand.Models
+namespace Dockhand.Dtos
 {
     public class ContainerStat
     {

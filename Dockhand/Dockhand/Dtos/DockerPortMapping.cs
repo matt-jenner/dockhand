@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Dockhand.Models
+﻿namespace Dockhand.Dtos
 {
-    class DockerPortMapping
+    public class DockerPortMapping
     {
         public int InternalPort { get; }
         public int ExternalPort { get; }
