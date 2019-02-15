@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Dockhand.Client;
 using Dockhand.Dtos;
-using Dockhand.Models;
 using NUnit.Framework;
 
 namespace Tests
@@ -18,7 +17,7 @@ namespace Tests
             var stats = await container.MonitorStatsFor(TimeSpan.FromSeconds(60));
             await container.KillAsync();
             await container.RemoveAsync();
-            await image.RemoveAsync();
+            //await image.RemoveAsync();
         }
 
         [Test]

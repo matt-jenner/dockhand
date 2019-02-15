@@ -5,19 +5,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dockhand.Dtos;
 using Dockhand.Exceptions;
+using Dockhand.Interfaces;
 using Dockhand.Models;
 using Dockhand.Utils;
 
 namespace Dockhand.Client
 {
-    public partial class DockerClient
+    public partial class DockerClient : IDockerClient
     {
         public async Task<bool> ContainerExistsAsync(string id)
         {
             try
             {
                 var cmd = DockerCommands.Container.ListIds;
-                var command = cmd.RunCommand(_workingDirectory);
+                var command = _commandFactory.RunCommand(cmd, _workingDirectory);
 
                 await command.Task;
 
@@ -39,7 +40,7 @@ namespace Dockhand.Client
         internal async Task<DockerContainer> StartContainerAsync(string imageId, DockerPortMapping[] portMappings)
         {
             var cmd = DockerCommands.Image.RunContainer(imageId, portMappings);
-            var command = cmd.RunCommand(_workingDirectory, new CancellationToken());
+            var command = _commandFactory.RunCommand(cmd, _workingDirectory, new CancellationToken());
 
             await command.Task;
 
@@ -58,7 +59,7 @@ namespace Dockhand.Client
         internal async Task KillContainerAsync(string containerId)
         {
             var cmd = DockerCommands.Container.Kill(containerId);
-            var command = cmd.RunCommand(_workingDirectory, new CancellationToken());
+            var command = _commandFactory.RunCommand(cmd, _workingDirectory, new CancellationToken());
 
             await command.Task;
 
@@ -73,7 +74,7 @@ namespace Dockhand.Client
         internal async Task RemoveContainerAsync(string containerId)
         {
             var cmd = DockerCommands.Container.Remove(containerId);
-            var command = cmd.RunCommand(_workingDirectory, new CancellationToken());
+            var command = _commandFactory.RunCommand(cmd, _workingDirectory, new CancellationToken());
 
             await command.Task;
 
@@ -93,7 +94,7 @@ namespace Dockhand.Client
             var output = new List<string>();
             while (!cts.Token.IsCancellationRequested)
             {
-                var command = cmd.RunCommand(_workingDirectory);
+                var command = _commandFactory.RunCommand(cmd, _workingDirectory);
 
                 await command.Task;
 

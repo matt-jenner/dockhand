@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Dockhand.Dtos;
 using Dockhand.Exceptions;
 using Dockhand.Models;
-using Dockhand.Utils;
 using Newtonsoft.Json;
 
 namespace Dockhand.Client
@@ -15,8 +14,8 @@ namespace Dockhand.Client
         public async Task<DockerImage> BuildImageAsync(string dockerfile, string target, string repository, string tag)
         {
             var cmd = DockerCommands.Image.Build(dockerfile, target, repository, tag);
-            var command = cmd.RunCommand(_workingDirectory, new CancellationToken());
-
+            var command = _commandFactory.RunCommand(cmd, _workingDirectory, new CancellationToken());
+            
             await command.Task;
 
             var output = command.GetOutputAndErrorLines().ToList();
@@ -45,7 +44,7 @@ namespace Dockhand.Client
         public async Task<IEnumerable<DockerImage>> GetImagesAsync()
         {
             var cmd = DockerCommands.Image.List();
-            var command = cmd.RunCommand(_workingDirectory);
+            var command = _commandFactory.RunCommand(cmd, _workingDirectory);
 
             await command.Task;
 
@@ -66,7 +65,7 @@ namespace Dockhand.Client
             try
             {
                 var cmd = DockerCommands.Image.ListIds;
-                var command = cmd.RunCommand(_workingDirectory);
+                var command = _commandFactory.RunCommand(cmd, _workingDirectory);
 
                 await command.Task;
 
@@ -88,7 +87,7 @@ namespace Dockhand.Client
         internal async Task RemoveImageAsync(string imageId)
         {
             var cmd = DockerCommands.Image.Remove(imageId);
-            var command = cmd.RunCommand(_workingDirectory, new CancellationToken());
+            var command = _commandFactory.RunCommand(cmd, _workingDirectory, new CancellationToken());
 
             await command.Task;
 
