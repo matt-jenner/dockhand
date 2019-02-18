@@ -7,7 +7,7 @@ namespace Dockhand.Interfaces
 {
     internal interface ICommandWrapper
     {
-        CommandResult Result { get; }
+        ICommandResult Result { get; }
         ProcessStreamReader StandardError { get; }
         ProcessStreamWriter StandardInput { get; }
         ProcessStreamReader StandardOutput { get; }

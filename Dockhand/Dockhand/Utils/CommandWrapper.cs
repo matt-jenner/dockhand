@@ -9,10 +9,12 @@ namespace Dockhand.Utils
     internal class CommandWrapper : ICommandWrapper
     {
         private readonly Command _command;
+        private ICommandResult _result;
 
         internal CommandWrapper(Command command)
         {
             _command = command;
+            _result = null;
         }
 
         /// <summary>Writes to the process's standard input</summary>
@@ -41,7 +43,7 @@ namespace Dockhand.Utils
         /// this will throw the faulting <see cref="T:System.Exception" /> or <see cref="T:System.Threading.Tasks.TaskCanceledException" /> rather than
         /// the wrapped <see cref="T:System.AggregateException" /> thrown by <see cref="P:System.Threading.Tasks.Task`1.Result" />
         /// </summary>
-        public CommandResult Result => _command.Result;
+        public ICommandResult Result => _result ?? (_result = new CommandResultWrapper(_command.Result));
 
         /// <summary>
         /// A <see cref="P:Medallion.Shell.Command.Task" /> representing the progress of this <see cref="T:Medallion.Shell.Command" />

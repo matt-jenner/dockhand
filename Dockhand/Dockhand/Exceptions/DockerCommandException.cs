@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Dockhand.Exceptions
 {
-    class DockerCommandException : Exception
+    public class DockerCommandException : Exception
     {
         public DockerCommandException(string command, IEnumerable<string> output) : base($"The docker command did not exit with the expected result.{Environment.NewLine}" +
                                                                                          $"Command: {command}{Environment.NewLine}" +

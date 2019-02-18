@@ -1,84 +1,70 @@
-﻿using System;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dockhand.Client;
 using Dockhand.Dtos;
 using Dockhand.Exceptions;
+using Dockhand.Interfaces;
 
 namespace Dockhand.Models
 {
-    public class DockerImage
+    public class DockerImage : DockerEntity
     {
-        public string Id => _imageRecord.Id;
-        public string Repository => _imageRecord.Repository;
-        public string Tag => _imageRecord.Tag;
+        public string Repository { get; }
+        public string Tag { get; }
 
-        public bool Deleted { get; private set; }
-
-
-        private readonly DockerClient _client;
-        private readonly DockerImageResult _imageRecord;
+        private readonly IDockerClient _client;
+        private readonly IRunCommands _commandFactory;
         
-        internal DockerImage(DockerClient client, DockerImageResult imageResult)
+        internal DockerImage(IDockerClient client, IRunCommands commandFactory, DockerImageResult imageResult)
         {
             _client = client;
-            _imageRecord = imageResult;
-            Deleted = false;
+            _commandFactory = commandFactory;
+            Id = imageResult.Id;
+            Repository = imageResult.Repository;
+            Tag = imageResult.Tag;
         }
 
-        public async Task<DockerContainer> StartContainerAsync(DockerPortMapping[] portMappings) => await EnsureExistsBefore<DockerContainer>(() => _client.StartContainerAsync(_imageRecord.Id, portMappings));
+        public async Task<DockerContainer> StartContainerAsync(DockerPortMapping[] portMappings) => await EnsureExistsBefore<DockerContainer>(() => StartContainerAsync(Id, portMappings));
 
-        public async Task RemoveAsync() => await EnsureExistsBefore(() => _client.RemoveImageAsync(_imageRecord.Id));
+        public async Task RemoveAsync() => await EnsureExistsBefore(() => RemoveImageAsync(Id));
 
-        private async Task<T> EnsureExistsBefore<T>(Func<Task<T>> commandFunc)
+        internal async Task<DockerContainer> StartContainerAsync(string imageId, DockerPortMapping[] portMappings)
         {
-            if (Deleted)
+            var cmd = DockerCommands.Image.RunContainer(imageId, portMappings);
+            var command = _commandFactory.RunCommand(cmd, _client.WorkingDirectory, new CancellationToken());
+
+            await command.Task;
+
+            var success = command.Result.Success;
+
+            if (!success)
             {
-                throw new DockerImageDeletedException(_imageRecord.Id);
+                throw new DockerCommandException(cmd, command.GetOutputAndErrorLines().ToList());
             }
 
-            try
-            {
-                return await commandFunc();
-            }
-            catch (DockerCommandException e)
-            {
-                // Check if the image exists still
-                Deleted = !(await _client.ImageExistsAsync(_imageRecord.Id));
+            var containerId = command.Result.StandardOutput.Substring(0, 12);
 
-                if (Deleted)
-                {
-                    throw new DockerImageNotFoundException(_imageRecord.Repository, _imageRecord.Tag, _imageRecord.Id, e);
-                }
-
-                // Otherwise throw the DockerCommandException
-                throw;
-            }
+            return new DockerContainer(_client, _commandFactory, containerId, portMappings);
         }
 
-        private async Task EnsureExistsBefore(Func<Task> commandFunc)
+        internal async Task RemoveImageAsync(string imageId)
         {
-            if (Deleted)
-            {
-                throw new DockerImageDeletedException(_imageRecord.Id);
-            }
+            var cmd = DockerCommands.Image.Remove(imageId);
+            var command = _commandFactory.RunCommand(cmd, _client.WorkingDirectory, new CancellationToken());
 
-            try
-            {
-                await commandFunc();
-            }
-            catch (DockerCommandException e)
-            {
-                // Check if the image exists still
-                Deleted = !(await _client.ImageExistsAsync(_imageRecord.Id));
+            await command.Task;
 
-                if (Deleted)
-                {
-                    throw new DockerImageNotFoundException(_imageRecord.Repository, _imageRecord.Tag, _imageRecord.Id, e);
-                }
+            var success = command.Result.Success;
 
-                // Otherwise throw the DockerCommandException
-                throw;
+            if (!success)
+            {
+                throw new DockerCommandException(cmd, command.GetOutputAndErrorLines().ToList());
             }
         }
+
+        protected override async Task<bool> ExistsAction() => await _client.ImageExistsAsync(Id);
+        protected override void ErrorAction(DockerCommandException e) => throw new DockerImageNotFoundException(Id, e);
+        protected override void DeletedAction() => throw new DockerImageDeletedException(Id);
     }
 }
