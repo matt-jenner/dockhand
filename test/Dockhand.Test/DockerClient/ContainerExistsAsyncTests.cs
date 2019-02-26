@@ -42,7 +42,7 @@ namespace Dockhand.Test.DockerClient
         [TestCase("testId", "otherId, thingyId")]
         [TestCase("testId", "thingyId")]
         [TestCase("testId", "")]
-        public async Task CommandIsSuccessfulContainerNotExist(string containerId, string results)
+        public async Task CommandIsSuccessfulContainerDoesNotExist(string containerId, string results)
         {
             // Arrange
             var containerIds = results.Split(',');
@@ -62,7 +62,6 @@ namespace Dockhand.Test.DockerClient
         {
             // Arrange
             var mockCommandFactory = BuildMockListContainerCommandWithScenario(false, new []{ "command error" });
-
             var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
@@ -86,32 +85,6 @@ namespace Dockhand.Test.DockerClient
                     .Build();
 
             return mockCommandFactory;
-
-
-
-
-
-            //var workingDirectory = Directory.GetCurrentDirectory();
-
-            //var listContainersCommandResult = Substitute.For<ICommandResult>();
-            //listContainersCommandResult.Success.Returns(success);
-
-            //var listContainersCommand = Substitute.For<ICommandWrapper>();
-            //listContainersCommand
-            //    .Result
-            //    .Returns(listContainersCommandResult);
-
-
-            //listContainersCommand
-            //    .GetOutputAndErrorLines()
-            //    .Returns(commandOutput);
-
-            //var mockCommandFactory = Substitute.For<IRunCommands>();
-            //mockCommandFactory
-            //    .RunCommand(DockerCommands.Container.ListIds, workingDirectory, Arg.Any<CancellationToken?>())
-            //    .Returns(listContainersCommand);
-
-            //return mockCommandFactory;
         }
     }
 }

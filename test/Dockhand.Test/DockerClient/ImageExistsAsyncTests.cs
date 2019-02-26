@@ -86,32 +86,6 @@ namespace Dockhand.Test.DockerClient
                     .Build();
 
             return mockCommandFactory;
-
-
-
-
-
-            //var workingDirectory = Directory.GetCurrentDirectory();
-
-            //var listContainersCommandResult = Substitute.For<ICommandResult>();
-            //listContainersCommandResult.Success.Returns(success);
-
-            //var listContainersCommand = Substitute.For<ICommandWrapper>();
-            //listContainersCommand
-            //    .Result
-            //    .Returns(listContainersCommandResult);
-
-
-            //listContainersCommand
-            //    .GetOutputAndErrorLines()
-            //    .Returns(commandOutput);
-
-            //var mockCommandFactory = Substitute.For<IRunCommands>();
-            //mockCommandFactory
-            //    .RunCommand(DockerCommands.Container.ListIds, workingDirectory, Arg.Any<CancellationToken?>())
-            //    .Returns(listContainersCommand);
-
-            //return mockCommandFactory;
         }
     }
 }

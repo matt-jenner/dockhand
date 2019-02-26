@@ -1,4 +1,4 @@
-﻿namespace Dockhand.Utils
+﻿namespace Dockhand.Utils.Extensions
 {
     public static class IntegerExtensions
     {

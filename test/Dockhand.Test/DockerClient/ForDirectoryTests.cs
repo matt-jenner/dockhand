@@ -5,7 +5,7 @@ using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Dockhand.Test
+namespace Dockhand.Test.DockerClient
 {
     [TestFixture]
     public class ForDirectoryTests
@@ -41,7 +41,6 @@ namespace Dockhand.Test
             var validDirectory = Directory.GetCurrentDirectory();
             // Act
             var sut = new Client.DockerClient(validDirectory, mockCommandFactory);
-
 
             // Assert
             sut.WorkingDirectory.Should().Be(validDirectory);

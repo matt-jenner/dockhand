@@ -34,22 +34,20 @@ namespace Dockhand.Test.DockerClient
         public async Task CommandsIsSuccessful_ImageFound()
         {
             // Arrange
-            var workingDirectory = Directory.GetCurrentDirectory();
             var imageOutput = new[]
             {
                 new DockerImageResult { Id = ExpectedImageId1, Repository = ExpectedRepository1, Tag = ExpectedTag1 },
                 new DockerImageResult { Id = ExpectedImageId2, Repository = ExpectedRepository2, Tag = ExpectedTag2 }
             };
             var mockCommandFactory = BuildMockCommandFactoryForScenario(true, imageOutput);
+            var expectedResult = new { Id = ExpectedImageId1, Repository = ExpectedRepository1, Tag = ExpectedTag1, Deleted = false }.ToExpectedObject();
 
-            var sut = new Client.DockerClient(workingDirectory, mockCommandFactory);
+            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
             var result = await sut.GetImageAsync(ExpectedRepository1, ExpectedTag1);
 
             // Assert
-            var expectedResult = new { Id = ExpectedImageId1, Repository = ExpectedRepository1, Tag = ExpectedTag1, Deleted = false }.ToExpectedObject();
-
             expectedResult.ShouldMatch(result);
         }
 
@@ -57,7 +55,7 @@ namespace Dockhand.Test.DockerClient
         public void CommandsIsSuccessful_ImageNotFound_ExceptionType()
         {
             // Arrange
-            var workingDirectory = Directory.GetCurrentDirectory();
+
             var imageOutput = new[]
             {
                 new DockerImageResult { Id = ExpectedImageId1, Repository = ExpectedRepository1, Tag = ExpectedTag1 },
@@ -65,7 +63,7 @@ namespace Dockhand.Test.DockerClient
             };
             var mockCommandFactory = BuildMockCommandFactoryForScenario(true, imageOutput);
 
-            var sut = new Client.DockerClient(workingDirectory, mockCommandFactory);
+            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
             var exception = Assert.CatchAsync(async () => await sut.GetImageAsync("wontfindthisrepo", ExpectedTag1));
@@ -78,10 +76,9 @@ namespace Dockhand.Test.DockerClient
         public void CommandIsNotSuccessfulExceptionThrown()
         {
             // Arrange
-            var workingDirectory = Directory.GetCurrentDirectory();
             var mockCommandFactory = BuildMockCommandFactoryForScenario(false, new DockerImageResult[0]);
 
-            var sut = new Client.DockerClient(workingDirectory, mockCommandFactory);
+            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
             var exception = Assert.CatchAsync(async () => await sut.GetImageAsync(ExpectedRepository1, ExpectedTag1));

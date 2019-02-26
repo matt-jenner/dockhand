@@ -96,7 +96,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
             var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
@@ -161,9 +161,9 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var expectedResult = new Dockhand.Models.DockerContainer(mockDockerClient, mockCommandFactory, "thisislonger", new DockerPortMapping[0]);
+            var expectedResult = new DockerContainer(mockDockerClient, mockCommandFactory, "thisislonger", new DockerPortMapping[0]);
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
             var result = await sut.StartContainerAsync(new DockerPortMapping[0]);
@@ -195,7 +195,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
             await sut.StartContainerAsync(new DockerPortMapping[0]);
@@ -227,7 +227,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
             var initialDeletedState = sut.Deleted;
 
             // Act
@@ -257,7 +257,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
             Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
@@ -286,7 +286,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
             var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
@@ -315,7 +315,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
             Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
@@ -344,7 +344,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
             Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
@@ -367,7 +367,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage)
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage)
             {
                 Deleted = true
             };
@@ -393,7 +393,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage)
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage)
             {
                 Deleted = true
             };
@@ -419,7 +419,7 @@ namespace Dockhand.Test.Models.DockerImageTests
                 Tag = ExpectedTag
             };
 
-            var sut = new Dockhand.Models.DockerImage(mockDockerClient, mockCommandFactory, dockerImage)
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage)
             {
                 Deleted = true
             };

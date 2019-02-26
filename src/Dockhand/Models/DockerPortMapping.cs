@@ -1,5 +1,5 @@
 ﻿using System;
-using Dockhand.Utils;
+using Dockhand.Utils.Extensions;
 
 namespace Dockhand.Models
 {

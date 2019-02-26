@@ -34,7 +34,6 @@ namespace Dockhand.Test.DockerClient
         public async Task CommandsIsSuccessful_ReturnsDockerImages()
         {
             // Arrange
-            var workingDirectory = Directory.GetCurrentDirectory();
             var imageOutput = new[]
             {
                 new DockerImageResult { Id = ExpectedImageId1, Repository = ExpectedRepository1, Tag = ExpectedTag1 },
@@ -42,7 +41,7 @@ namespace Dockhand.Test.DockerClient
             };
             var mockCommandFactory = BuildMockCommandFactoryForScenario(true, imageOutput);
 
-            var sut = new Client.DockerClient(workingDirectory, mockCommandFactory);
+            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
             var result = await sut.GetImagesAsync();
@@ -61,11 +60,10 @@ namespace Dockhand.Test.DockerClient
         public async Task CommandsIsSuccessful_NoDockerImages()
         {
             // Arrange
-            var workingDirectory = Directory.GetCurrentDirectory();
             var imageOutput = new DockerImageResult[0];
             var mockCommandFactory = BuildMockCommandFactoryForScenario(true, imageOutput);
 
-            var sut = new Client.DockerClient(workingDirectory, mockCommandFactory);
+            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
             var result = await sut.GetImagesAsync();
@@ -78,10 +76,9 @@ namespace Dockhand.Test.DockerClient
         public void CommandIsNotSuccessfulExceptionThrown()
         {
             // Arrange
-            var workingDirectory = Directory.GetCurrentDirectory();
             var mockCommandFactory = BuildMockCommandFactoryForScenario(false, new DockerImageResult[0]);
 
-            var sut = new Client.DockerClient(workingDirectory, mockCommandFactory);
+            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
             var exception = Assert.CatchAsync(async () => await sut.GetImagesAsync());
