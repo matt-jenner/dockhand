@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Dockhand.Exceptions;
 
@@ -9,10 +8,13 @@ namespace Dockhand.Models
     public abstract class DockerEntity
     {
         public string Id { get; protected set; }
-        public bool Deleted { get; private set; }
+        public bool Deleted { get; internal set; }
 
+        [ExcludeFromCodeCoverage]
         protected virtual Task<bool> ExistsAction() => throw new NotImplementedException();
+        [ExcludeFromCodeCoverage]
         protected virtual void ErrorAction(DockerCommandException e) => throw new NotImplementedException();
+        [ExcludeFromCodeCoverage]
         protected virtual void DeletedAction() => throw new NotImplementedException();
 
         protected DockerEntity()
@@ -25,7 +27,6 @@ namespace Dockhand.Models
             if (Deleted)
             {
                 DeletedAction();
-                //throw new DockerContainerDeletedException(Id);
             }
 
             try
@@ -34,17 +35,13 @@ namespace Dockhand.Models
             }
             catch (DockerCommandException e)
             {
-                // Check if the container exists still
-                //Deleted = !(await _client.ContainerExistsAsync(Id));
                 Deleted = !(await ExistsAction());
 
                 if (Deleted)
                 {
                     ErrorAction(e);
-                    //throw new DockerContainerNotFoundException(Id, e);
                 }
 
-                // Otherwise throw the DockerCommandException
                 throw;
             }
         }
@@ -53,8 +50,8 @@ namespace Dockhand.Models
         {
             if (Deleted)
             {
-                //throw new DockerContainerDeletedException(Id);
                 DeletedAction();
+                return;
             }
 
             try
@@ -64,16 +61,13 @@ namespace Dockhand.Models
             catch (DockerCommandException e)
             {
                 // Check if the image exists still
-                // Deleted = !(await _client.ContainerExistsAsync(Id));
                 Deleted = !(await ExistsAction());
 
                 if (Deleted)
                 {
                     ErrorAction(e);
-                    //throw new DockerContainerNotFoundException(Id, e);
                 }
 
-                // Otherwise throw the DockerCommandException
                 throw;
             }
         }

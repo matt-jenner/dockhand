@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Dockhand.Interfaces;
+using Medallion.Shell.Streams;
 using NSubstitute;
 
 namespace Dockhand.Test.Builders
@@ -40,6 +44,13 @@ namespace Dockhand.Test.Builders
             return this;
         }
 
+        internal MockCommandWrapperBuilder WithOutput(params string[] output)
+        {
+            _output = output;
+            return this;
+        }
+
+
         internal ICommandWrapper Build()
         {
             var commandResult = Substitute.For<ICommandResult>();
@@ -55,7 +66,12 @@ namespace Dockhand.Test.Builders
                 .GetOutputAndErrorLines()
                 .Returns(_output);
 
+            command.StandardOutput.Returns(StringToStreamReader(string.Join(Environment.NewLine, _output)));
+            command.StandardError.Returns(StringToStreamReader(string.Join(Environment.NewLine, _output)));
+
             return command;
         }
+
+        private StreamReader StringToStreamReader(string input) => new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(input)));
     }
 }

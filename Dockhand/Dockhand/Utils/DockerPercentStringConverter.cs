@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -6,30 +7,40 @@ namespace Dockhand.Utils
 {
     public class DockerPercentStringConverter : JsonConverter
     {
+        public override bool CanWrite => false;
+
         public override bool CanConvert(Type objectType)
         {
             return (objectType == typeof(decimal) || objectType == typeof(decimal?));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            JToken token = JToken.Load(reader);
-            if (token.Type == JTokenType.Float || token.Type == JTokenType.Integer)
+        {           
+            var token = JToken.Load(reader);
+            switch (token.Type)
             {
-                return token.ToObject<decimal>();
-            }
-            if (token.Type == JTokenType.String)
-            {
-                // customize this to suit your needs
-                var value = token.ToString().Replace("%", "");
+                case JTokenType.Float:
+                case JTokenType.Integer:
+                    return token.ToObject<decimal>();
+                case JTokenType.String:
+                {
+                    var value = token
+                        .ToString()
+                        .Trim()
+                        .TrimEnd('%');
 
-                return decimal.Parse(value, System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+                    if (!decimal.TryParse(value, out var result))
+                    {
+                        throw new JsonSerializationException($"Invalid decimal string format");
+                    };
+
+                    return result;
+                }
+                case JTokenType.Null when objectType == typeof(decimal?):
+                    return null;
+                default:
+                    throw new JsonSerializationException($"Unexpected token type: {token.Type}");
             }
-            if (token.Type == JTokenType.Null && objectType == typeof(decimal?))
-            {
-                return null;
-            }
-            throw new JsonSerializationException($"Unexpected token type: {token.Type}");
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

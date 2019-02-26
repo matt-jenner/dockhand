@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,6 +64,8 @@ namespace Dockhand.Models
             {
                 throw new DockerCommandException(cmd, command.GetOutputAndErrorLines().ToList());
             }
+
+            Deleted = true;
         }
 
         internal async Task<ContainerStatsObservation> GetContainerStats(string containerId, TimeSpan monitorPeriod)
@@ -71,11 +74,19 @@ namespace Dockhand.Models
             var cmd = DockerCommands.Container.GetStats(containerId);
 
             var output = new List<string>();
-            while (!cts.Token.IsCancellationRequested)
+            var runOnce = false;
+            while (!(cts.Token.IsCancellationRequested || runOnce))
             {
+                runOnce = true;
+
                 var command = _commandFactory.RunCommand(cmd, _client.WorkingDirectory);
 
                 await command.Task;
+
+                if (!command.Result.Success)
+                {
+                    throw new DockerCommandException(cmd, command.GetOutputAndErrorLines());
+                }
 
                 output.Add(command.StandardOutput.ReadToEnd());
             }

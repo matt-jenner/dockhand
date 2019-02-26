@@ -25,10 +25,10 @@ namespace Dockhand.Utils
 
         private ICommandWrapper RunViaBash(string cmd, string workingDirectory, CancellationToken? ct)
         {
-            var escapedArgs = cmd.Replace("\"", "\\\"");
+            var escapedCmd = cmd.Replace("\"", "\\\"");
 
             var shell = new CancellableShell(ct, workingDirectory);
-            return new CommandWrapper(shell.Run("/bin/bash", "-c", $"\"{escapedArgs}\""));
+            return new CommandWrapper(shell.Run("/bin/bash", "-c", $"\"{escapedCmd}\""));
         }
 
         private ICommandWrapper RunViaCmd(string cmd, string workingDirectory, CancellationToken? ct)

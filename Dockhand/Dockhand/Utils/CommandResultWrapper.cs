@@ -1,8 +1,10 @@
-﻿using Dockhand.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using Dockhand.Interfaces;
 using Medallion.Shell;
 
 namespace Dockhand.Utils
 {
+    [ExcludeFromCodeCoverage]
     internal class CommandResultWrapper : ICommandResult
     {
         private readonly CommandResult _commandResult;

@@ -73,22 +73,6 @@ namespace Dockhand.Test.DockerClient
             exception.Should().BeOfType<DockerCommandException>();
         }
 
-        [Test]
-        public void CommandIsNotSuccessfulExceptionContainsOutput()
-        {
-            // Arrange
-            var commandOutput = new[] {"command error","some other message"};
-            var mockCommandFactory = BuildMockCommandFactoryForScenario(false, commandOutput);
-
-            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
-
-            // Act
-            var exception = Assert.CatchAsync<DockerCommandException>(async () => await sut.ImageExistsAsync("testId"));
-
-            // Assert
-            exception.Message.Should().Contain(string.Join(Environment.NewLine, commandOutput));
-        }
-
         private IRunCommands BuildMockCommandFactoryForScenario(bool success, string[] commandOutput)
         {
             var commandString = DockerCommands.Image.ListIds;

@@ -43,7 +43,14 @@ namespace Dockhand.Models
                 throw new DockerCommandException(cmd, command.GetOutputAndErrorLines().ToList());
             }
 
-            var containerId = command.Result.StandardOutput.Substring(0, 12);
+            var output = command.GetOutputAndErrorLines();
+            var firstLine = output.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(firstLine) || firstLine.Length < 12)
+            {
+                throw new DockerCommandUnexpectedOutputException(cmd, command.GetOutputAndErrorLines().ToList());
+            }
+
+            var containerId = firstLine.Substring(0, 12);
 
             return new DockerContainer(_client, _commandFactory, containerId, portMappings);
         }
@@ -61,6 +68,8 @@ namespace Dockhand.Models
             {
                 throw new DockerCommandException(cmd, command.GetOutputAndErrorLines().ToList());
             }
+
+            Deleted = true;
         }
 
         protected override async Task<bool> ExistsAction() => await _client.ImageExistsAsync(Id);

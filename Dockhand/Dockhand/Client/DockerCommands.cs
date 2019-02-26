@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Dockhand.Dtos;
+using Dockhand.Models;
 
 namespace Dockhand.Client
 {

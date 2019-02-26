@@ -1,5 +1,8 @@
-﻿namespace Dockhand.Dtos
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Dockhand.Dtos
 {
+    [ExcludeFromCodeCoverage]
     internal class DockerImageResult
     {
         public string Repository { get; set; }
