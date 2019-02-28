@@ -27,6 +27,7 @@ namespace Dockhand.Models
             if (Deleted)
             {
                 DeletedAction();
+                return default(T);
             }
 
             try

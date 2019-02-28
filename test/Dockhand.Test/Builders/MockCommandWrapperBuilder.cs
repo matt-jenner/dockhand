@@ -65,8 +65,8 @@ namespace Dockhand.Test.Builders
                 .GetOutputAndErrorLines()
                 .Returns(_output);
 
-            command.StandardOutput.Returns(StringToStreamReader(string.Join(Environment.NewLine, _output)));
-            command.StandardError.Returns(StringToStreamReader(string.Join(Environment.NewLine, _output)));
+            command.StandardOutput.Returns(x => StringToStreamReader(string.Join(Environment.NewLine, _output)));
+            command.StandardError.Returns(x => StringToStreamReader(string.Join(Environment.NewLine, _output)));
 
             return command;
         }

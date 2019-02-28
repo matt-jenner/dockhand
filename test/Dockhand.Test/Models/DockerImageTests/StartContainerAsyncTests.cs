@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,10 +31,13 @@ namespace Dockhand.Test.Models.DockerImageTests
         }
 
         [Test]
-        [TestCase(null, null, null, null)]
-        [TestCase(1, 80, null, null)]
-        [TestCase(5, 30, 3, 14)]
-        public async Task WhenNotDeleted_CallStartContainer(int? internalPort1, int? externalPort1, int? internalPort2, int? externalPort2)
+        [TestCase(null, null, null, null, null)]
+        [TestCase(null, null, null, null, 4)]
+        [TestCase(null, null, null, null, int.MaxValue)]
+        [TestCase(1, 80, null, null, null)]
+        [TestCase(1, 80, null, null, 4)]
+        [TestCase(5, 30, 3, 14, null)]
+        public async Task WhenNotDeleted_CallStartContainer(int? internalPort1, int? externalPort1, int? internalPort2, int? externalPort2, int? memoryLimit)
         {
             // Arrange
             var expectedPortMappings = new List<DockerPortMapping>();
@@ -53,7 +57,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, expectedPortMappings), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, expectedPortMappings, memoryLimit), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -66,10 +70,10 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            await sut.StartContainerAsync(expectedPortMappings.ToArray());
+            await sut.StartContainerAsync(expectedPortMappings.ToArray(), memoryLimit);
 
             // Assert
-            mockCommandFactory.Received(1).RunCommand(DockerCommands.Image.RunContainer(ExpectedId, expectedPortMappings), _workingDirectory, Arg.Any<CancellationToken?>());
+            mockCommandFactory.Received(1).RunCommand(DockerCommands.Image.RunContainer(ExpectedId, expectedPortMappings, memoryLimit), _workingDirectory, Arg.Any<CancellationToken?>());
         }
 
         [Test]
@@ -238,7 +242,39 @@ namespace Dockhand.Test.Models.DockerImageTests
         }
 
         [Test]
-        public async Task WhenStartContainerFails_CallsImageExists()
+        [TestCase(0)]
+        [TestCase(-1)]
+        [TestCase(3)]
+        public async Task WhenContainerMemorySpecifiedIsTooLow(int memoryLimitMb)
+        {
+            // Arrange
+            var mockDockerClient = BuildMockDockerClient(true, true);
+
+            var mockCommand = MotherFor.CommandWrapper.ThatFails().WithExitCode(-1).Build();
+
+            var mockCommandFactory = MotherFor.CommandFactory
+                .ForWorkingDirectory(_workingDirectory)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0], memoryLimitMb), mockCommand)
+                .Build();
+
+            var dockerImage = new DockerImageResult
+            {
+                Id = ExpectedId,
+                Repository = ExpectedRepository,
+                Tag = ExpectedTag
+            };
+
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+
+            // Act
+            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0], memoryLimitMb));
+
+            // Assert
+            exception.Should().BeOfType<ArgumentException>();
+        }
+
+        [Test]
+        public async Task WhenCommandFails_CallsImageExists()
         {
             // Arrange
             var mockDockerClient = BuildMockDockerClient(true, true);
@@ -267,7 +303,7 @@ namespace Dockhand.Test.Models.DockerImageTests
         }
 
         [Test]
-        public void WhenStartContainerFails_ThrowsDockerCommandException()
+        public void WhenCommandFails_ThrowsDockerCommandException()
         {
             // Arrange
             var mockDockerClient = BuildMockDockerClient(true, true);

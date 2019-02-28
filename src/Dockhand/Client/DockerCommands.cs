@@ -22,13 +22,18 @@ namespace Dockhand.Client
 
             internal static string ListIds = "docker image ls -q";
 
-            internal static string RunContainer(string imageId, IEnumerable<DockerPortMapping> portMappings)
+            internal static string RunContainer(string imageId, IEnumerable<DockerPortMapping> portMappings, int? memoryLimitMb = null)
             {
                 var command = "docker run -d ";
                 var portStringArguments = portMappings.Select(p => $"-p {p.ToString()}").ToArray();
                 if (portStringArguments.Length > 0)
                 {
                     command = command + $" {string.Join(" ", portStringArguments)}";
+                }
+
+                if (memoryLimitMb.HasValue)
+                {
+                    command = command + $" --memory {memoryLimitMb.Value}m";
                 }
                 return command + $" {imageId}";
             }

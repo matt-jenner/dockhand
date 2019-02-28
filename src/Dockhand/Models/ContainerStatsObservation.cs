@@ -16,7 +16,9 @@ namespace Dockhand.Models
             _stats = responseLines.Select(line =>
             {
                 var containerStat = JsonConvert.DeserializeObject<ContainerStat>(line);
-                ValidateStat(containerStat);  
+
+                ValidateStat(containerStat);
+
                 return containerStat;
             }).ToList();
 
@@ -33,8 +35,11 @@ namespace Dockhand.Models
 
         private void ValidateStat(ContainerStat stat)
         {
-            if (stat.cpu < 0) { ThrowNegativeStatException("cpu", stat.cpu); }
-            if (stat.mem < 0) { ThrowNegativeStatException("mem", stat.mem); }
+            if (stat.cpu < 0)
+                ThrowNegativeStatException("cpu", stat.cpu);
+            
+            if (stat.mem < 0)
+                ThrowNegativeStatException("mem", stat.mem);
         }
 
         private void ThrowNegativeStatException(string statName, decimal value) => throw new ArgumentException($"The {statName} stat should not ever be negative, but encountered negative value: {value}");

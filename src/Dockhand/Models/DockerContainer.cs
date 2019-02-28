@@ -72,11 +72,9 @@ namespace Dockhand.Models
             var cmd = DockerCommands.Container.GetStats(containerId);
 
             var output = new List<string>();
-            var runOnce = false;
-            while (!(cts.Token.IsCancellationRequested || runOnce))
+            
+            do
             {
-                runOnce = true;
-
                 var command = _commandFactory.RunCommand(cmd, _client.WorkingDirectory);
 
                 await command.Task;
@@ -85,9 +83,8 @@ namespace Dockhand.Models
                 {
                     throw new DockerCommandException(cmd, command.GetOutputAndErrorLines());
                 }
-
-                output.Add(command.StandardOutput.ReadToEnd());
-            }
+                output.Add(command.StandardOutput.ReadLine());
+            } while (!cts.Token.IsCancellationRequested);
 
             return new ContainerStatsObservation(output);
         }

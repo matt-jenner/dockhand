@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dockhand.Client;
@@ -25,13 +26,18 @@ namespace Dockhand.Models
             Tag = imageResult.Tag;
         }
 
-        public async Task<DockerContainer> StartContainerAsync(DockerPortMapping[] portMappings) => await EnsureExistsBefore<DockerContainer>(() => StartContainerAsync(Id, portMappings));
+        public async Task<DockerContainer> StartContainerAsync(DockerPortMapping[] portMappings, int? memoryLimitMb = null) => await EnsureExistsBefore<DockerContainer>(() => StartContainerAsync(Id, portMappings, memoryLimitMb));
 
         public async Task RemoveAsync() => await EnsureExistsBefore(() => RemoveImageAsync(Id));
 
-        internal async Task<DockerContainer> StartContainerAsync(string imageId, DockerPortMapping[] portMappings)
+        internal async Task<DockerContainer> StartContainerAsync(string imageId, DockerPortMapping[] portMappings, int? memoryLimitMb)
         {
-            var cmd = DockerCommands.Image.RunContainer(imageId, portMappings);
+            if (memoryLimitMb.HasValue && memoryLimitMb < 4)
+            {
+                throw new ArgumentException("If a memory limit is specified, the minimum limit (specified in mb) that can be set is 4 mb");
+            }
+
+            var cmd = DockerCommands.Image.RunContainer(imageId, portMappings, memoryLimitMb);
             var command = _commandFactory.RunCommand(cmd, _client.WorkingDirectory, new CancellationToken());
 
             await command.Task;
