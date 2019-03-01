@@ -5,7 +5,7 @@ using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Dockhand.Test.DockerClient
+namespace Dockhand.Test.Client.DockerClient
 {
     [TestFixture]
     public class ForDirectoryTests
@@ -17,7 +17,7 @@ namespace Dockhand.Test.DockerClient
         public void ConstructorWithInvalidDirectory(string testPath)
         {
             // Act
-            var exception = Assert.Catch(() => Client.DockerClient.ForDirectory(testPath));
+            var exception = Assert.Catch(() => Dockhand.Client.DockerClient.ForDirectory(testPath));
 
             // Assert
             exception.Should().BeOfType<ArgumentException>();
@@ -27,10 +27,10 @@ namespace Dockhand.Test.DockerClient
         public void ConstructorWithValidDirectory()
         { 
             // Act
-            var sut = Client.DockerClient.ForDirectory(Directory.GetCurrentDirectory());
+            var sut = Dockhand.Client.DockerClient.ForDirectory(Directory.GetCurrentDirectory());
 
             // Assert
-            sut.Should().BeOfType<Client.DockerClient>();
+            sut.Should().BeOfType<Dockhand.Client.DockerClient>();
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace Dockhand.Test.DockerClient
             var mockCommandFactory = Substitute.For<IRunCommands>();
             var validDirectory = Directory.GetCurrentDirectory();
             // Act
-            var sut = new Client.DockerClient(validDirectory, mockCommandFactory);
+            var sut = new Dockhand.Client.DockerClient(validDirectory, mockCommandFactory);
 
             // Assert
             sut.WorkingDirectory.Should().Be(validDirectory);

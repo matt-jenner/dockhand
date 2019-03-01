@@ -26,18 +26,21 @@ namespace Dockhand.Models
             Tag = imageResult.Tag;
         }
 
-        public async Task<DockerContainer> StartContainerAsync(DockerPortMapping[] portMappings, int? memoryLimitMb = null) => await EnsureExistsBefore<DockerContainer>(() => StartContainerAsync(Id, portMappings, memoryLimitMb));
+        public async Task<DockerContainer> StartContainerAsync(Action<StartContainerOptions> configureOptions = null) => await EnsureExistsBefore(() => StartContainerAsync(Id, configureOptions));
 
         public async Task RemoveAsync() => await EnsureExistsBefore(() => RemoveImageAsync(Id));
 
-        internal async Task<DockerContainer> StartContainerAsync(string imageId, DockerPortMapping[] portMappings, int? memoryLimitMb)
+        internal async Task<DockerContainer> StartContainerAsync(string imageId, Action<StartContainerOptions> configureOptions = null)
         {
-            if (memoryLimitMb.HasValue && memoryLimitMb < 4)
+            StartContainerOptions options = null;
+            if (configureOptions != null)
             {
-                throw new ArgumentException("If a memory limit is specified, the minimum limit (specified in mb) that can be set is 4 mb");
+                options = new StartContainerOptions();
+                configureOptions(options);
+                options.Validate();
             }
 
-            var cmd = DockerCommands.Image.RunContainer(imageId, portMappings, memoryLimitMb);
+            var cmd = DockerCommands.Image.RunContainer(imageId, options);
             var command = _commandFactory.RunCommand(cmd, _client.WorkingDirectory, new CancellationToken());
 
             await command.Task;
@@ -58,7 +61,7 @@ namespace Dockhand.Models
 
             var containerId = firstLine.Substring(0, 12);
 
-            return new DockerContainer(_client, _commandFactory, containerId, portMappings);
+            return new DockerContainer(_client, _commandFactory, containerId, options?.DockerPortMappings);
         }
 
         internal async Task RemoveImageAsync(string imageId)

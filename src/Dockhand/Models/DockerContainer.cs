@@ -11,18 +11,18 @@ namespace Dockhand.Models
 {
     public class DockerContainer : DockerEntity
     {
-        public DockerPortMapping[] PortMappings { get; }
+        public IEnumerable<DockerPortMapping> PortMappings { get; }
 
         private readonly IDockerClient _client;
         private readonly IRunCommands _commandFactory;
 
         internal DockerContainer(IDockerClient client, IRunCommands commandFactory, string containerId,
-            DockerPortMapping[] portMappings)
+            IEnumerable<DockerPortMapping> portMappings)
         {
             _client = client;
             _commandFactory = commandFactory;
             Id = containerId;
-            PortMappings = portMappings;
+            PortMappings = portMappings ?? new DockerPortMapping[0];
         }
 
         public async Task KillAsync() => await EnsureExistsBefore(() => 

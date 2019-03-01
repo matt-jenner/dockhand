@@ -31,33 +31,16 @@ namespace Dockhand.Test.Models.DockerImageTests
         }
 
         [Test]
-        [TestCase(null, null, null, null, null)]
-        [TestCase(null, null, null, null, 4)]
-        [TestCase(null, null, null, null, int.MaxValue)]
-        [TestCase(1, 80, null, null, null)]
-        [TestCase(1, 80, null, null, 4)]
-        [TestCase(5, 30, 3, 14, null)]
-        public async Task WhenNotDeleted_CallStartContainer(int? internalPort1, int? externalPort1, int? internalPort2, int? externalPort2, int? memoryLimit)
+        public async Task WhenNotDeleted_CallsStartContainer()
         {
             // Arrange
-            var expectedPortMappings = new List<DockerPortMapping>();
-            if (internalPort1.HasValue && externalPort1.HasValue)
-            {
-                expectedPortMappings.Add(new DockerPortMapping(internalPort1.Value, externalPort1.Value));
-            }
-
-            if (internalPort2.HasValue && externalPort2.HasValue)
-            {
-                expectedPortMappings.Add(new DockerPortMapping(internalPort2.Value, externalPort2.Value));
-            }
-
             var mockDockerClient = BuildMockDockerClient(true, true);
 
             var mockCommand = MotherFor.CommandWrapper.ThatSucceeds().WithOutput("twelvecharac").Build();
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, expectedPortMappings, memoryLimit), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -70,10 +53,10 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            await sut.StartContainerAsync(expectedPortMappings.ToArray(), memoryLimit);
+            await sut.StartContainerAsync();
 
             // Assert
-            mockCommandFactory.Received(1).RunCommand(DockerCommands.Image.RunContainer(ExpectedId, expectedPortMappings, memoryLimit), _workingDirectory, Arg.Any<CancellationToken?>());
+            mockCommandFactory.Received(1).RunCommand(DockerCommands.Image.RunContainer(ExpectedId, null), _workingDirectory, Arg.Any<CancellationToken?>());
         }
 
         [Test]
@@ -90,7 +73,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0]), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -103,7 +86,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
+            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync());
 
             // Assert
             exception.Should().BeOfType<DockerCommandUnexpectedOutputException>();
@@ -122,7 +105,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0]), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -135,7 +118,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            var result = await sut.StartContainerAsync(new DockerPortMapping[0]);
+            var result = await sut.StartContainerAsync();
 
             // Assert
             result.Should().BeOfType<DockerContainer>();
@@ -155,7 +138,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0]), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -170,7 +153,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            var result = await sut.StartContainerAsync(new DockerPortMapping[0]);
+            var result = await sut.StartContainerAsync();
 
             // Assert
             result.Should().BeEquivalentTo(expectedResult);
@@ -189,7 +172,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0]), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -202,7 +185,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            await sut.StartContainerAsync(new DockerPortMapping[0]);
+            await sut.StartContainerAsync();
 
             // Assert
             await mockDockerClient.DidNotReceive().ImageExistsAsync(Arg.Any<string>());
@@ -221,7 +204,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0]), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -235,7 +218,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             var initialDeletedState = sut.Deleted;
 
             // Act
-            await sut.StartContainerAsync(new DockerPortMapping[0]);
+            await sut.StartContainerAsync();
 
             // Assert
             sut.Deleted.Should().Be(initialDeletedState);
@@ -245,7 +228,7 @@ namespace Dockhand.Test.Models.DockerImageTests
         [TestCase(0)]
         [TestCase(-1)]
         [TestCase(3)]
-        public async Task WhenContainerMemorySpecifiedIsTooLow(int memoryLimitMb)
+        public void WhenContainerMemoryLimitSpecifiedIsTooLow(int memoryLimitMb)
         {
             // Arrange
             var mockDockerClient = BuildMockDockerClient(true, true);
@@ -254,7 +237,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0], memoryLimitMb), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new StartContainerOptions().WithMemoryLimit(memoryLimitMb)), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -267,7 +250,38 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0], memoryLimitMb));
+            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync(o => o.WithMemoryLimit(memoryLimitMb)));
+
+            // Assert
+            exception.Should().BeOfType<ArgumentException>();
+        }
+
+        [Test]
+        public void WhenContainerCpuLimitSpecifiedIsTooHigh()
+        {
+            // Arrange
+            var aboveMaxCpuCount = Environment.ProcessorCount + 0.1m;
+
+            var mockDockerClient = BuildMockDockerClient(true, true);
+
+            var mockCommand = MotherFor.CommandWrapper.ThatFails().WithExitCode(-1).Build();
+
+            var mockCommandFactory = MotherFor.CommandFactory
+                .ForWorkingDirectory(_workingDirectory)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new StartContainerOptions().WithCpuLimit(aboveMaxCpuCount)), mockCommand)
+                .Build();
+
+            var dockerImage = new DockerImageResult
+            {
+                Id = ExpectedId,
+                Repository = ExpectedRepository,
+                Tag = ExpectedTag
+            };
+
+            var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
+
+            // Act
+            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync(o => o.WithCpuLimit(aboveMaxCpuCount)));
 
             // Assert
             exception.Should().BeOfType<ArgumentException>();
@@ -283,7 +297,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0]), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -296,7 +310,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
+            Assert.CatchAsync(async () => await sut.StartContainerAsync());
 
             // Assert
             await mockDockerClient.Received(1).ImageExistsAsync(Arg.Any<string>());
@@ -312,7 +326,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0]), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -325,7 +339,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
+            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync());
 
             // Assert
             exception.Should().BeOfType<DockerCommandException>();
@@ -341,7 +355,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0]), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -354,7 +368,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
+            Assert.CatchAsync(async () => await sut.StartContainerAsync());
 
             // Assert
             sut.Deleted.Should().BeTrue();
@@ -370,7 +384,7 @@ namespace Dockhand.Test.Models.DockerImageTests
 
             var mockCommandFactory = MotherFor.CommandFactory
                 .ForWorkingDirectory(_workingDirectory)
-                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, new DockerPortMapping[0]), mockCommand)
+                .ForCommandReturn(DockerCommands.Image.RunContainer(ExpectedId, null), mockCommand)
                 .Build();
 
             var dockerImage = new DockerImageResult
@@ -383,7 +397,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             var sut = new DockerImage(mockDockerClient, mockCommandFactory, dockerImage);
 
             // Act
-            Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
+            Assert.CatchAsync(async () => await sut.StartContainerAsync());
 
             // Assert
             sut.Deleted.Should().BeFalse();
@@ -409,7 +423,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             };
 
             // Act
-            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync( new DockerPortMapping[0]));
+            var exception = Assert.CatchAsync(async () => await sut.StartContainerAsync());
 
             // Assert
             exception.Should().BeOfType<DockerImageDeletedException>();
@@ -435,7 +449,7 @@ namespace Dockhand.Test.Models.DockerImageTests
             };
 
             // Act
-            Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
+            Assert.CatchAsync(async () => await sut.StartContainerAsync());
 
             // Assert
             mockCommandFactory.DidNotReceive().RunCommand(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken?>());
@@ -461,28 +475,10 @@ namespace Dockhand.Test.Models.DockerImageTests
             };
 
             // Act
-            Assert.CatchAsync(async () => await sut.StartContainerAsync(new DockerPortMapping[0]));
+            Assert.CatchAsync(async () => await sut.StartContainerAsync());
 
             // Assert
             mockDockerClient.DidNotReceive().ImageExistsAsync(Arg.Any<string>());
-        }
-
-        private IRunCommands BuildMockCommandFactoryForScenario(bool removeSucceeds, string[] removeOutput)
-        {
-
-            var removeCommandString = DockerCommands.Image.Remove(ExpectedId);
-            var removeCommand = removeSucceeds
-                ? MotherFor.CommandWrapper.ThatSucceeds().WithOutput(removeOutput).Build()
-                : MotherFor.CommandWrapper.ThatFails().WithOutput(removeOutput).Build();
-
-
-            var mockCommandFactory =
-                MotherFor.CommandFactory
-                    .ForWorkingDirectory(_workingDirectory)
-                    .ForCommandReturn(removeCommandString, removeCommand)
-                    .Build();
-
-            return mockCommandFactory;
         }
 
         private IDockerClient BuildMockDockerClient(bool imageExistsSucceeds, bool imageExists)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Dockhand.Dtos;
 using Dockhand.Models;
 
 namespace Dockhand.Client
@@ -22,19 +23,26 @@ namespace Dockhand.Client
 
             internal static string ListIds = "docker image ls -q";
 
-            internal static string RunContainer(string imageId, IEnumerable<DockerPortMapping> portMappings, int? memoryLimitMb = null)
+            internal static string RunContainer(string imageId, StartContainerOptions options)
             {
-                var command = "docker run -d ";
-                var portStringArguments = portMappings.Select(p => $"-p {p.ToString()}").ToArray();
-                if (portStringArguments.Length > 0)
+                var command = "docker run -d";
+
+                if (options?.DockerPortMappings.Any() ?? false)
                 {
+                    var portStringArguments = options.DockerPortMappings.Select(p => $"-p {p.ToString()}").ToArray();
                     command = command + $" {string.Join(" ", portStringArguments)}";
                 }
-
-                if (memoryLimitMb.HasValue)
+                
+                if (options?.MemoryLimitMb != null)
                 {
-                    command = command + $" --memory {memoryLimitMb.Value}m";
+                    command = command + $" --memory {options.MemoryLimitMb.Value}m";
                 }
+
+                if (options?.CpuLimit != null)
+                {
+                    command = command + $" --cpu \"{options.CpuLimit.Value}\"";
+                }
+
                 return command + $" {imageId}";
             }
 

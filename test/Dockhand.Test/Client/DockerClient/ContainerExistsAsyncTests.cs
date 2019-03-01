@@ -1,13 +1,12 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using Dockhand.Client;
 using Dockhand.Exceptions;
 using Dockhand.Interfaces;
 using Dockhand.Test.Builders;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Dockhand.Test.DockerClient
+namespace Dockhand.Test.Client.DockerClient
 {
     [TestFixture]
     public class ContainerExistsAsyncTests
@@ -29,7 +28,7 @@ namespace Dockhand.Test.DockerClient
             var containerIds = results.Split(',');
             var mockCommandFactory = BuildMockListContainerCommandWithScenario(true, containerIds);
 
-            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
+            var sut = new Dockhand.Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
             var result = await sut.ContainerExistsAsync("testId");
@@ -48,7 +47,7 @@ namespace Dockhand.Test.DockerClient
             var containerIds = results.Split(',');
             var mockCommandFactory = BuildMockListContainerCommandWithScenario(true, containerIds);
 
-            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
+            var sut = new Dockhand.Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
             var result = await sut.ContainerExistsAsync("testId");
@@ -62,7 +61,7 @@ namespace Dockhand.Test.DockerClient
         {
             // Arrange
             var mockCommandFactory = BuildMockListContainerCommandWithScenario(false, new []{ "command error" });
-            var sut = new Client.DockerClient(_workingDirectory, mockCommandFactory);
+            var sut = new Dockhand.Client.DockerClient(_workingDirectory, mockCommandFactory);
 
             // Act
             var exception = Assert.CatchAsync(async () => await sut.ContainerExistsAsync("testId"));
@@ -73,7 +72,7 @@ namespace Dockhand.Test.DockerClient
 
         private IRunCommands BuildMockListContainerCommandWithScenario(bool success, string[] commandOutput)
         {
-            var commandString = DockerCommands.Container.ListIds;
+            var commandString = Dockhand.Client.DockerCommands.Container.ListIds;
             var listCommand = success
                 ? MotherFor.CommandWrapper.ThatSucceeds().WithOutput(commandOutput).Build()
                 : MotherFor.CommandWrapper.ThatFails().WithOutput(commandOutput).Build();
