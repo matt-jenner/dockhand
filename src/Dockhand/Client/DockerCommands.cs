@@ -35,12 +35,12 @@ namespace Dockhand.Client
                 
                 if (options?.MemoryLimitMb != null)
                 {
-                    command = command + $" --memory {options.MemoryLimitMb.Value}m";
+                    command = command + $" --memory=\"{options.MemoryLimitMb.Value}m\"";
                 }
 
                 if (options?.CpuLimit != null)
                 {
-                    command = command + $" --cpu \"{options.CpuLimit.Value}\"";
+                    command = command + $" --cpus=\"{options.CpuLimit.Value}\"";
                 }
 
                 return command + $" {imageId}";
