@@ -9,7 +9,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EC5599D2-8A2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2B84DB98-5D67-4567-8903-09F290D92C21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dockhand", "src\Dockhand\Dockhand.csproj", "{DFCC52D0-463A-449F-8D25-198D2B5C1A5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dockhand", "src\Dockhand\Dockhand.csproj", "{DFCC52D0-463A-449F-8D25-198D2B5C1A5E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B90DED89-F20B-4CEE-A5AB-1C04F70BB46F}"
+	ProjectSection(SolutionItems) = preProject
+		pipeline.yml = pipeline.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
