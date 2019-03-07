@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Dockhand</PackageId>
-    <Version>0.0.4.1</Version>
+    <Version>0.0.4.2-h</Version>
     <Authors>Matt Jenner</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>

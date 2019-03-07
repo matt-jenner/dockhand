@@ -8,6 +8,8 @@
 
         internal static ContainerStatsJsonBuilder ContainerStatsJson(decimal cpu, decimal mem) => new ContainerStatsJsonBuilder(cpu, mem);
 
-        internal static ObservationsJsonBuilder ObservationsJsonBuilder => new ObservationsJsonBuilder();
+        //internal static ObservationsJsonBuilder ObservationsJsonBuilder => new ObservationsJsonBuilder();
+
+        internal static ObservationsBuilder ObservationsBuilder => new ObservationsBuilder();
     }
 }

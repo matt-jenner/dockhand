@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dockhand.Client;
+using Dockhand.Dtos;
 using Dockhand.Exceptions;
 using Dockhand.Interfaces;
+using Newtonsoft.Json;
 
 namespace Dockhand.Models
 {
@@ -33,6 +35,9 @@ namespace Dockhand.Models
 
         public async Task<ContainerStatsObservation> MonitorStatsFor(TimeSpan period) => 
             await EnsureExistsBefore(() => GetContainerStats(Id, period));
+
+        public async Task<DockerContainerStat> GetCurrentStat() =>
+            await EnsureExistsBefore(() => GetContainerStat(Id));
 
         internal async Task KillContainerAsync(string containerId)
         {
@@ -69,24 +74,35 @@ namespace Dockhand.Models
         internal async Task<ContainerStatsObservation> GetContainerStats(string containerId, TimeSpan monitorPeriod)
         {
             var cts = new CancellationTokenSource(monitorPeriod);
-            var cmd = DockerCommands.Container.GetStats(containerId);
 
-            var output = new List<string>();
+            var output = new List<DockerContainerStat>();
             
             do
             {
-                var command = _commandFactory.RunCommand(cmd, _client.WorkingDirectory);
-
-                await command.Task;
-
-                if (!command.Result.Success)
-                {
-                    throw new DockerCommandException(cmd, command.GetOutputAndErrorLines());
-                }
-                output.Add(command.StandardOutput.ReadLine());
+                var stat = await GetContainerStat(containerId);
+                output.Add(stat);
             } while (!cts.Token.IsCancellationRequested);
 
             return new ContainerStatsObservation(output);
+        }
+
+        internal async Task<DockerContainerStat> GetContainerStat(string containerId)
+        {
+            var cmd = DockerCommands.Container.GetStats(containerId);
+            var command = _commandFactory.RunCommand(cmd, _client.WorkingDirectory);
+
+            await command.Task;
+
+            if (!command.Result.Success)
+            {
+                throw new DockerCommandException(cmd, command.GetOutputAndErrorLines());
+            }
+
+            var output = command.StandardOutput.ReadLine();
+
+            var containerStat = JsonConvert.DeserializeObject<ContainerStatDto>(output);
+
+            return new DockerContainerStat(containerStat.Cpu, containerStat.Mem);
         }
 
         protected override async Task<bool> ExistsAction() => await _client.ContainerExistsAsync(Id);

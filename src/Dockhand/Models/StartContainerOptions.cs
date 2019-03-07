@@ -55,8 +55,8 @@ namespace Dockhand.Dtos
         private void CpuLimitIsValidForContainer()
         {
             var totalCoreCount = Environment.ProcessorCount;
-            if (CpuLimit > totalCoreCount)
-                throw new ArgumentException($"If a cpu limit is specified, it must be a positive decimal and be less than the total number of cpu cores available ({totalCoreCount}) .");
+            if (CpuLimit > totalCoreCount || CpuLimit <= 0)
+                throw new ArgumentException($"If a cpu limit is specified, it must be a positive decimal and be less than (or equal to) the total number of cpu cores available ({totalCoreCount}) .");
         }
 
         private void MemoryLimitIsValidForContainer()

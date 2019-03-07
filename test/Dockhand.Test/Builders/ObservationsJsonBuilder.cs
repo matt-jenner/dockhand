@@ -1,35 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dockhand.Models;
 
 namespace Dockhand.Test.Builders
 {
-    internal class ObservationsBuilder
+    internal class ObservationsJsonBuilder
     {
         private IList<decimal> _cpus;
         private IList<decimal> _mems;
 
-        internal ObservationsBuilder()
+        internal ObservationsJsonBuilder()
         {
             _cpus = new decimal[0];
             _mems = new decimal[0];
         }
 
-        internal ObservationsBuilder WithCpuReadings(params decimal[] readings)
+        internal ObservationsJsonBuilder WithCpuReadings(params decimal[] readings)
         {
             _cpus = readings;
             return this;
         }
 
-        internal ObservationsBuilder WithMemReadings(params decimal[] readings)
+        internal ObservationsJsonBuilder WithMemReadings(params decimal[] readings)
         {
             _mems = readings;
             return this;
         }
 
 
-        internal IEnumerable<DockerContainerStat> Build()
+        internal IEnumerable<string> Build()
         {
             if (_mems.Count == 0)
             {
@@ -46,7 +45,7 @@ namespace Dockhand.Test.Builders
                 throw new ArgumentException("The number of CPU and Memory readings do not match up!");
             }
 
-            return _cpus.Select((c, i) => new DockerContainerStat(c, _mems[i]));
+            return _cpus.Select((c, i) => new ContainerStatsJsonBuilder(c, _mems[i]).Build());
         } 
     }
 }

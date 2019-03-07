@@ -27,14 +27,6 @@ namespace Dockhand.Test.Models
                 new [] { 0m, 0m },
             };
 
-        public static IEnumerable<decimal[]> NegativeStatResultTestCases =>
-            new List<decimal[]>
-            {
-                new [] { -1m, 0m },
-                new [] { 0m, -1m, 1m },
-                new [] { 1m, 1m, -1m },
-            };
-
         [Test]
         [TestCaseSource(nameof(AverageStatResultTestCases))]
         public void ItCalculatesAverageCpu(decimal[] cpuValues)
@@ -45,7 +37,7 @@ namespace Dockhand.Test.Models
 
 
             var observations = MotherFor
-                .ObservationsJsonBuilder
+                .ObservationsBuilder
                 .WithCpuReadings(cpuValues)
                 .Build();
 
@@ -66,7 +58,7 @@ namespace Dockhand.Test.Models
             var expectedMax = cpuValues.Max();
 
             var observations = MotherFor
-                .ObservationsJsonBuilder
+                .ObservationsBuilder
                 .WithCpuReadings(cpuValues)
                 .Build();
 
@@ -80,20 +72,6 @@ namespace Dockhand.Test.Models
         }
 
         [Test]
-        [TestCaseSource(nameof(NegativeStatResultTestCases))]
-        public void ThrowsIfAnyCpuResultsAreNegative(params decimal[] cpuReadings)
-        {
-            // Assert
-            var observations = MotherFor.ObservationsJsonBuilder.WithCpuReadings(cpuReadings).Build();
-
-            // Act/Assert
-            var exception = Assert.Catch(() => new ContainerStatsObservation(observations));
-
-            //Assert
-            exception.Should().BeOfType<ArgumentException>();
-        }
-
-        [Test]
         [TestCaseSource(nameof(AverageStatResultTestCases))]
         public void ItCalculatesAverageMem(decimal[] memValues)
         {
@@ -103,7 +81,7 @@ namespace Dockhand.Test.Models
 
 
             var observations = MotherFor
-                .ObservationsJsonBuilder
+                .ObservationsBuilder
                 .WithMemReadings(memValues)
                 .Build();
 
@@ -124,7 +102,7 @@ namespace Dockhand.Test.Models
             var expectedMax = memValues.Max();
 
             var observations = MotherFor
-                .ObservationsJsonBuilder
+                .ObservationsBuilder
                 .WithMemReadings(memValues)
                 .Build();
 
@@ -138,24 +116,10 @@ namespace Dockhand.Test.Models
         }
 
         [Test]
-        [TestCaseSource(nameof(NegativeStatResultTestCases))]
-        public void ThrowsIfAnyMemResultsAreNegative(params decimal[] memReadings)
-        {
-            // Assert
-            var observations = MotherFor.ObservationsJsonBuilder.WithMemReadings(memReadings).Build();
-
-            // Act/Assert
-            var exception = Assert.Catch(() => new ContainerStatsObservation(observations));
-
-            //Assert
-            exception.Should().BeOfType<ArgumentException>();
-        }
-
-        [Test]
         public void ThrowsIfNoResults()
         {
             // Act/Assert
-            var exception = Assert.Catch(() => new ContainerStatsObservation(new string[0]));
+            var exception = Assert.Catch(() => new ContainerStatsObservation(new DockerContainerStat[0]));
 
             //Assert
             exception.Should().BeOfType<ArgumentException>();

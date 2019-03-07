@@ -45,7 +45,7 @@ namespace Dockhand.Test.Client.DockerCommands
             var result = Dockhand.Client.DockerCommands.Image.RunContainer(ImageId, options);
 
             // Assert
-            result.Should().Be($"docker run -d --memory=\"1m\" {ImageId}");
+            result.Should().Be($"docker run -d --memory 1m {ImageId}");
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace Dockhand.Test.Client.DockerCommands
             var result = Dockhand.Client.DockerCommands.Image.RunContainer(ImageId, options);
 
             // Assert
-            result.Should().Contain($"docker run -d --cpus=\"0\" {ImageId}");
+            result.Should().Contain($"docker run -d --cpus 0 {ImageId}");
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace Dockhand.Test.Client.DockerCommands
             var result = Dockhand.Client.DockerCommands.Image.RunContainer(ImageId, options);
 
             // Assert
-            result.Should().Contain($"docker run -d --memory=\"0m\" --cpus=\"16.5\" {ImageId}");
+            result.Should().Contain($"docker run -d --memory 0m --cpus 16.5 {ImageId}");
         }
 
         [Test]

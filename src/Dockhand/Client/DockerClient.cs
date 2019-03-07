@@ -31,7 +31,7 @@ namespace Dockhand.Client
 
         public static DockerClient ForDirectory(string workingDirectory)
         {
-            return new DockerClient(workingDirectory, new CommandFactory());
+            return new DockerClient(workingDirectory, new CommandFactory(new ShellFactory(), new DockhandEnvironment()));
         }
 
         public async Task<bool> ContainerExistsAsync(string id)

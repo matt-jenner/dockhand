@@ -1,10 +1,11 @@
 ﻿using System.Threading;
 using CShellNet;
+using Dockhand.Interfaces;
 using Medallion.Shell;
 
 namespace Dockhand.Utils
 {
-    class CancellableShell : CShell
+    class CancellableShell : CShell, ICancellableShell
     {
         private CancellationToken? _ct;
 

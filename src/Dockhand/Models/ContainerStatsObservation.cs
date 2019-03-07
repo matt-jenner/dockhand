@@ -1,47 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dockhand.Dtos;
 using Dockhand.Utils.Extensions;
-using Newtonsoft.Json;
 
 namespace Dockhand.Models
 {
     public class ContainerStatsObservation
     {
-        private IEnumerable<ContainerStat> _stats;
+        private readonly IList<DockerContainerStat> _stats;
 
-        public ContainerStatsObservation(IEnumerable<string> responseLines)
+        public ContainerStatsObservation(IEnumerable<DockerContainerStat> stats)
         {
-            _stats = responseLines.Select(line =>
+            var containerStats = stats.ToList();
+            if (containerStats.IsEmpty())
             {
-                var containerStat = JsonConvert.DeserializeObject<ContainerStat>(line);
-
-                ValidateStat(containerStat);
-
-                return containerStat;
-            }).ToList();
-
-            if (_stats.IsEmpty())
-            {
-                throw new ArgumentException("The collection of response lines provided were empty.");
+                throw new ArgumentException("The collection of stats provided was empty.");
             }
+
+            _stats = containerStats;
         }
 
-        public decimal AverageCpu() => _stats.Average(x => x.cpu);
-        public decimal AverageMem() => _stats.Average(x => x.mem);
-        public decimal MaxCpu() => _stats.Max(x => x.cpu);
-        public decimal MaxMem() => _stats.Max(x => x.mem);
-
-        private void ValidateStat(ContainerStat stat)
-        {
-            if (stat.cpu < 0)
-                ThrowNegativeStatException("cpu", stat.cpu);
-            
-            if (stat.mem < 0)
-                ThrowNegativeStatException("mem", stat.mem);
-        }
-
-        private void ThrowNegativeStatException(string statName, decimal value) => throw new ArgumentException($"The {statName} stat should not ever be negative, but encountered negative value: {value}");
+        public decimal AverageCpu() => _stats.Average(x => x.Cpu);
+        public decimal AverageMem() => _stats.Average(x => x.Memory);
+        public decimal MaxCpu() => _stats.Max(x => x.Cpu);
+        public decimal MaxMem() => _stats.Max(x => x.Memory);       
     }
 }
