@@ -10,9 +10,10 @@
     <Copyright>Matt Jenner 2019</Copyright>
     <PackageProjectUrl>https://github.com/matt-jenner/dockhand</PackageProjectUrl>
     <RepositoryUrl>https://github.com/matt-jenner/dockhand</RepositoryUrl>
-    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryType>git</RepositoryType>
     <PackageTags>Docker, Dockhand, dock hand, container, containers, containerization, test, testing</PackageTags>
-    <PackageLicense>https://github.com/matt-jenner/dockhand/blob/master/LICENSE</PackageLicense>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIconUrl>https://github.com/matt-jenner/dockhand/docs/dockhand_logo_64x64.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
