@@ -13,7 +13,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Docker, Dockhand, dock hand, container, containers, containerization, test, testing</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageIconUrl>https://github.com/matt-jenner/dockhand/docs/dockhand_logo_64x64.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/matt-jenner/dockhand/master/docs/dockhand_logo_64x64.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
