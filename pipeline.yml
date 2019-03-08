@@ -10,6 +10,10 @@ pool:
   
 variables:
   buildConfiguration: 'Release'
+  Prerelease: ci
+  Major: '0'
+  Minor: '1'
+  Patch: '0'
 
 steps:
 - script: |
@@ -20,8 +24,15 @@ steps:
 - script: find -wholename '**/Dockhand.Test*/*.csproj' ! -name '*.Test.Common.csproj' -print | xargs -i dotnet test {} --configuration $(buildConfiguration) --logger trx
   displayName: Run Tests
   failOnStderr: true
+
 - script: dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
   displayName: Dotnet Publish
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet pack
+  inputs:
+    command: pack
+    packDirectory: '$(Build.ArtifactStagingDirectory)/packages'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
@@ -30,3 +41,6 @@ steps:
     testResultsFiles: '**/*.trx'
 
 - task: PublishBuildArtifacts@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'

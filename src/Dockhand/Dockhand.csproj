@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/matt-jenner/dockhand</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Docker, Dockhand, dock hand, container, containers, containerization, test, testing</PackageTags>
-    <PackageLicenseUrl>https://github.com/matt-jenner/dockhand/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicense>https://github.com/matt-jenner/dockhand/blob/master/LICENSE</PackageLicense>
   </PropertyGroup>
 
   <ItemGroup>
