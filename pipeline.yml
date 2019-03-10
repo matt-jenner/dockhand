@@ -25,14 +25,20 @@ steps:
   displayName: Run Tests
   failOnStderr: true
 
-- script: dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --version-suffix $(Build.BuildId) 
+- script: dotnet publish './src/Dockhand/Dockhand.csproj' --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --version-suffix $(Build.BuildId) 
   displayName: Dotnet Publish
 
-- task: DotNetCoreCLI@2
+- task: NuGetCommand@2
   displayName: dotnet pack
   inputs:
     command: pack
-    packDirectory: '$(Build.ArtifactStagingDirectory)/packages'
+    versioningScheme: byPrereleaseNumber
+    packagesToPack: './src/Dockhand/Dockhand.csproj'
+    packDestination: '$(Build.ArtifactStagingDirectory)/packages'
+    majorVersion: $(Major)
+    minorVersion: $(Minor)
+    patchVersion: $(Patch)
+    packTimezone: 'utc'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
