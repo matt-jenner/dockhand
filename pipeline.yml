@@ -17,7 +17,7 @@ variables:
 
 steps:
 - script: |
-    dotnet build --configuration $(buildConfiguration)
+    dotnet build --configuration $(buildConfiguration) --version-suffix $(Build.BuildId)
   displayName: Build
   env:
     pswd: $(dockerPassword)
@@ -25,7 +25,7 @@ steps:
   displayName: Run Tests
   failOnStderr: true
 
-- script: dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+- script: dotnet publish --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --version-suffix $(Build.BuildId) 
   displayName: Dotnet Publish
 
 - task: DotNetCoreCLI@2
