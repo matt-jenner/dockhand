@@ -3,9 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Dockhand</PackageId>
-    <Version>0.0.0.1</Version>
     <Authors>Matt Jenner</Authors>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>A simple Docker CLI wrapper for C# with a focus on testing.</Description>
     <Copyright>Matt Jenner 2019</Copyright>
     <PackageProjectUrl>https://github.com/matt-jenner/dockhand</PackageProjectUrl>
