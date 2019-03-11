@@ -12,8 +12,8 @@
   <Choose>
     <When Condition=" '$(Prerelease)' != '' ">
       <PropertyGroup>
-        <!-- Prerelease version numbers are MAJOR.MINOR.0-pre-build###### -->
-        <VersionSuffix>$(Prerelease)-build$(BUILD_BUILDID.PadLeft(6, '0'))</VersionSuffix>
+        <!-- Prerelease version numbers are MAJOR.MINOR.0-pre-build-###### -->
+        <VersionSuffix>$(Prerelease)-build-$(BUILD_BUILDNUMBER)</VersionSuffix>
       </PropertyGroup>
     </When>
     <Otherwise>
