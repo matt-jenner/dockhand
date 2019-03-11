@@ -25,8 +25,13 @@ steps:
   displayName: Run Tests
   failOnStderr: true
 
-- script: dotnet publish ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --version-suffix $(Build.BuildId) 
-  displayName: Dotnet Publish
+- script: dotnet publish ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --version-suffix $(Prerelease)-$(Build.BuildNumber)
+  condition: ne(variables['Prerelease'], '')
+  displayName: Dotnet Publish (Prerelease)
+
+- script: dotnet publish ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+  condition: eq(variables['Prerelease'], '')
+  displayName: Dotnet Publish (Release)
 
 - script: dotnet pack ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/package -p:PackageVersion=$(Major).$(Minor).$(Patch)-$(Prerelease)-$(Build.BuildNumber)
   condition: ne(variables['Prerelease'], '')
