@@ -10,14 +10,14 @@ pool:
   
 variables:
   buildConfiguration: 'Release'
-  Prerelease: ci
+  Prerelease: pre
   Major: '0'
   Minor: '1'
   Patch: '0'
 
 steps:
 - script: |
-    dotnet build --configuration $(buildConfiguration) --version-suffix $(Build.BuildId)
+    dotnet build --configuration $(buildConfiguration) --version-suffix $(Build.BuildId) -p:AssemblyVersion=$(Major).$(Minor).$(Patch).$(Build.BuildId)
   displayName: Build
   env:
     pswd: $(dockerPassword)
@@ -25,7 +25,7 @@ steps:
   displayName: Run Tests
   failOnStderr: true
 
-- script: dotnet publish ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --version-suffix $(Build.BuildId) 
+- script: dotnet publish ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) -p:AssemblyVersion=$(Major).$(Minor).$(Patch).$(Build.BuildId) --version-suffix $(Build.BuildId) 
   displayName: Dotnet Publish
 
 - script: dotnet pack ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/package --version-suffix $(Build.BuildId)
