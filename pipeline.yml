@@ -17,7 +17,7 @@ variables:
 
 steps:
 - script: |
-    dotnet build --configuration $(buildConfiguration) --version-suffix $(Build.BuildId) -p:AssemblyVersion=$(Major).$(Minor).$(Patch).$(Build.BuildId)
+    dotnet build --configuration $(buildConfiguration) --version-suffix $(Build.BuildId)
   displayName: Build
   env:
     pswd: $(dockerPassword)
@@ -25,11 +25,16 @@ steps:
   displayName: Run Tests
   failOnStderr: true
 
-- script: dotnet publish ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) -p:AssemblyVersion=$(Major).$(Minor).$(Patch).$(Build.BuildId) --version-suffix $(Build.BuildId) 
+- script: dotnet publish ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --version-suffix $(Build.BuildId) 
   displayName: Dotnet Publish
 
-- script: dotnet pack ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/package --version-suffix $(Build.BuildId)
-  displayName: Dotnet Pack
+- script: dotnet pack ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/package -p:PackageVersion=$(Major).$(Minor).$(Patch)-$(Prerelease)-$(Build.BuildNumber)
+  condition: ne(variables['Prerelease'], '')
+  displayName: Dotnet Pack (Prerelease)
+
+- script: dotnet pack ./src/Dockhand/Dockhand.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/package -p:PackageVersion=$(Major).$(Minor).$(Patch).$(Build.BuildId)
+  condition: eq(variables['Prerelease'], '')
+  displayName: Dotnet Pack (Release)
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
